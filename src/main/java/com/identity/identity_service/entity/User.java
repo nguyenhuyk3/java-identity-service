@@ -2,10 +2,13 @@ package com.identity.identity_service.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Entity // Đánh dấu class này là một entity (tương ứng với một bảng trong database).
 @Table(name = "user")
 public class User {

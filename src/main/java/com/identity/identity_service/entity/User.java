@@ -18,6 +18,7 @@ public class User {
     @Id // Đánh dấu field id là primary key (khóa chính) của entity.
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
     String username;
     String password;
     String firstName;

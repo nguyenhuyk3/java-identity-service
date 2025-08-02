@@ -1,10 +1,9 @@
 package com.identity.identity_service.controller;
 
-import com.identity.identity_service.dto.request.APIResponse;
+import com.identity.identity_service.dto.response.APIResponse;
 import com.identity.identity_service.dto.request.UserCreationRequest;
 import com.identity.identity_service.dto.request.UserUpdateRequest;
 import com.identity.identity_service.dto.response.UserResponse;
-import com.identity.identity_service.entity.User;
 import com.identity.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

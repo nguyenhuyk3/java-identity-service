@@ -3,13 +3,13 @@ package com.identity.identity_service.controller;
 import com.identity.identity_service.dto.request.APIResponse;
 import com.identity.identity_service.dto.request.UserCreationRequest;
 import com.identity.identity_service.dto.request.UserUpdateRequest;
+import com.identity.identity_service.dto.response.UserResponse;
 import com.identity.identity_service.entity.User;
 import com.identity.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,37 +38,44 @@ dùng để thiết lập mặc định cho tất cả các field trong class.
         - makeFinal = true: tất cả các field sẽ mặc định là final.
 */
 public class UserController {
-//    @Autowired
+    //    @Autowired
     UserService userService;
 
     @PostMapping
-    User createUser(@RequestBody @Valid UserCreationRequest req) {
-        APIResponse res = new APIResponse();
-
-        res.setResult(userService.createNewUser(req));
-
-        return userService.createNewUser(req);
+    APIResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest req) {
+        return APIResponse.<UserResponse>builder()
+                .result(userService.createNewUser(req))
+                .build();
     }
 
     @GetMapping
-    List<User> getUsers() {
-        return userService.getUsers();
+    APIResponse<List<UserResponse>> getUsers() {
+        return APIResponse.<List<UserResponse>>builder()
+                .result(userService.getUsers())
+                .build();
     }
 
+
     @GetMapping("/{userId}")
-    User getUser(@PathVariable("userId") String userId) {
-        return userService.getUser(userId);
+    APIResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
+        return APIResponse.<UserResponse>builder()
+                .result(userService.getUser(userId))
+                .build();
     }
 
     @PutMapping("/{userId}")
-    User updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
-        return userService.updateUser(userId, request);
+    APIResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+        return APIResponse.<UserResponse>builder()
+                .result(userService.updateUser(userId, request))
+                .build();
     }
 
     @DeleteMapping("/{userId}")
-    String deleteUser(@PathVariable String userId) {
+    APIResponse<String> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
 
-        return "User has been deleted";
+        return APIResponse.<String>builder()
+                .result("User has been deleted")
+                .build();
     }
 }

@@ -11,6 +11,8 @@ import com.identity.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,13 +54,17 @@ public class UserService {
         }
 
         User newUser = userMapper.toUser(req);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
+        newUser.setPassword(passwordEncoder.encode(req.getPassword()));
 
         return userMapper.toUserResponse(userRepository.save(newUser));
     }
 
-    public User getUser(String id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public UserResponse getUser(String id) {
+        return userMapper
+                .toUserResponse(userRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("User not found")));
     }
 
     public UserResponse updateUser(String id, UserUpdateRequest req) {

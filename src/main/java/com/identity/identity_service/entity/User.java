@@ -12,6 +12,8 @@ import java.time.LocalDate;
 @Entity // Đánh dấu class này là một entity (tương ứng với một bảng trong database).
 @Table(name = "user")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
+@Setter
 public class User {
     @Id // Đánh dấu field id là primary key (khóa chính) của entity.
     @GeneratedValue(strategy = GenerationType.UUID)

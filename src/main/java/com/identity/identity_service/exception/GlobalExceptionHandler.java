@@ -72,10 +72,11 @@ public class GlobalExceptionHandler {
 
         }
 
-        APIResponse res = new APIResponse();
-
-        res.setCode(errorCode.getCode());
-        res.setMessage(errorCode.getMessage());
+        APIResponse res = APIResponse
+                                .builder()
+                                .code(errorCode.getCode())
+                                .message(errorCode.getMessage())
+                                .build();
 
         return ResponseEntity.badRequest().body(res);
     }

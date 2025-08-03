@@ -66,13 +66,14 @@ public class UserService {
 
         roles.add(Role.USER.name());
 
+//        newUser.setRoles(roles);
+
         return userMapper.toUserResponse(userRepository.save(newUser));
     }
 
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String userName = context.getAuthentication().getName();
-
         User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -86,9 +87,7 @@ public class UserService {
     */
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id) {
-        return userMapper
-                .toUserResponse(userRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("User not found")));
+        return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found")));
     }
 
     public UserResponse updateUser(String id, UserUpdateRequest req) {
@@ -106,10 +105,6 @@ public class UserService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
-        return userRepository
-                .findAll()
-                .stream()
-                .map(userMapper::toUserResponse)
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userMapper::toUserResponse).collect(Collectors.toList());
     }
 }

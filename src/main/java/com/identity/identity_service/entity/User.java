@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Entity // Đánh dấu class này là một entity (tương ứng với một bảng trong database).
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 @Builder
@@ -25,5 +25,7 @@ public class User {
     String firstName;
     String lastName;
     LocalDate dateOfBirth;
-    Set<String> roles;
+
+    @ManyToMany
+    Set<Role> roles;
 }

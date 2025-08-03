@@ -60,7 +60,8 @@ public class AuthenticationService {
 //        return passwordEncoder.matches(req.getPassword(), user.getPassword());
 //    }
 
-    public IntrospectResponse introspect(IntrospectRequest req) throws JOSEException, ParseException {
+    public IntrospectResponse introspect(IntrospectRequest req)
+            throws JOSEException, ParseException {
         var token = req.getToken();
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -93,9 +94,9 @@ public class AuthenticationService {
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
-        if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(stringJoiner::add);
-        }
+//        if (!CollectionUtils.isEmpty(user.getRoles())) {
+//            user.getRoles().forEach(stringJoiner::add);
+//        }
 
         return stringJoiner.toString();
     }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
+
 @ControllerAdvice
 /*
     Đánh dấu class này là "bộ xử lý ngoại lệ toàn cục" (global exception handler) cho tất cả các controller trong app.
@@ -44,8 +46,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<APIResponse> handleRuntimeException(RuntimeException ex) {
-        log.error("Exception: ", ex);
-
         APIResponse res = new APIResponse();
 
         res.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
@@ -62,7 +62,22 @@ public class GlobalExceptionHandler {
         res.setCode(errorCode.getCode());
         res.setMessage(errorCode.getMessage());
 
-        return ResponseEntity.badRequest().body(res);
+        return ResponseEntity
+                .status(errorCode.getStatusCode())
+                .body(res);
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    ResponseEntity<APIResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+
+        return ResponseEntity
+                .status(errorCode
+                        .getStatusCode()).body(APIResponse
+                        .builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

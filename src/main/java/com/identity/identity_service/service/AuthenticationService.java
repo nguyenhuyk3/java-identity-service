@@ -2,7 +2,6 @@ package com.identity.identity_service.service;
 
 import com.identity.identity_service.dto.request.AuthenticationRequest;
 import com.identity.identity_service.dto.request.IntrospectRequest;
-import com.identity.identity_service.dto.response.APIResponse;
 import com.identity.identity_service.dto.response.AuthenticationResponse;
 import com.identity.identity_service.dto.response.IntrospectResponse;
 import com.identity.identity_service.entity.User;
@@ -77,8 +76,7 @@ public class AuthenticationService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository.findByUsername(req.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean authenticated = passwordEncoder.matches(req.getPassword(),
-                user.getPassword());
+        boolean authenticated = passwordEncoder.matches(req.getPassword(), user.getPassword());
 
         if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -92,7 +90,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    private String buildScope(User user){
+    private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
         if (!CollectionUtils.isEmpty(user.getRoles())) {

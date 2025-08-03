@@ -1,6 +1,5 @@
 package com.identity.identity_service.configuration;
 
-import com.identity.identity_service.enums.Role;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;

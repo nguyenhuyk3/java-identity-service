@@ -106,10 +106,6 @@ public class UserService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
-        var context = SecurityContextHolder.getContext();
-
-        System.out.println(context.getAuthentication().getName());
-
         return userRepository
                 .findAll()
                 .stream()

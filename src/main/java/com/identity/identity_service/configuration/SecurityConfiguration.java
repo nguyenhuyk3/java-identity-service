@@ -1,5 +1,6 @@
 package com.identity.identity_service.configuration;
 
+import com.identity.identity_service.enums.Role;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -10,9 +11,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -56,8 +61,8 @@ public class SecurityConfiguration {
         */
         httpSecurity.authorizeHttpRequests(
                 req -> req
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
-                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
                         .anyRequest()
                         .authenticated());
         /*
@@ -65,11 +70,16 @@ public class SecurityConfiguration {
         mà chỉ nhận và xác minh token từ client.
             jwt().decoder(jwtDecoder()): sử dụng 1 hàm jwtDecoder() do bạn định nghĩa riêng để giải mã và xác thực token JWT.
         */
-        httpSecurity.oauth2ResourceServer(
-                oauth2 -> oauth2
-                        .jwt(
-                                jwtConfigurer -> jwtConfigurer
-                                        .decoder(jwtDecoder())));
+//        httpSecurity.oauth2ResourceServer(
+//                oauth2 -> oauth2
+//                        .jwt(
+//                                jwtConfigurer -> jwtConfigurer
+//                                        .decoder(jwtDecoder())));
+
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer ->
+                        jwtConfigurer.decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -83,5 +93,30 @@ public class SecurityConfiguration {
                 .withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
+
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // Tạo ra một đối tượng chuyên dùng để lấy danh sách quyền (authorities) từ claim trong JWT.
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        /*
+           Nói rằng mỗi quyền (authority) lấy từ JWT sẽ được thêm tiền tố "ROLE_".
+           Ví dụ:
+                - Nếu trong JWT có roles: ["ADMIN"], thì sau khi convert, bạn sẽ nhận được quyền: ROLE_ADMIN
+                - Điều này giúp bạn dùng hasRole("ADMIN") trong Spring Security
+        */
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        // Gán converter vào JwtAuthenticationConverter, để khi Spring phân tích JWT, nó biết phải lấy quyền từ đâu và thêm tiền tố thế nào.
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
+        return jwtAuthenticationConverter;
     }
 }

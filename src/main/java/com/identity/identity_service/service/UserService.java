@@ -4,6 +4,7 @@ import com.identity.identity_service.dto.request.UserCreationRequest;
 import com.identity.identity_service.dto.request.UserUpdateRequest;
 import com.identity.identity_service.dto.response.UserResponse;
 import com.identity.identity_service.entity.User;
+import com.identity.identity_service.enums.Role;
 import com.identity.identity_service.exception.AppException;
 import com.identity.identity_service.exception.ErrorCode;
 import com.identity.identity_service.mapper.UserMapper;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,7 @@ public class UserService {
     //    @Autowired // @Autowired dùng để tự động tiêm (inject) một bean vào class đang sử dụng.
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
 //    public User createNewUser(UserCreationRequest req) {
 //        User newUser = new User();
@@ -54,9 +57,12 @@ public class UserService {
         }
 
         User newUser = userMapper.toUser(req);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
         newUser.setPassword(passwordEncoder.encode(req.getPassword()));
+
+        HashSet<String> roles = new HashSet<>();
+
+        roles.add(Role.USER.name());
 
         return userMapper.toUserResponse(userRepository.save(newUser));
     }

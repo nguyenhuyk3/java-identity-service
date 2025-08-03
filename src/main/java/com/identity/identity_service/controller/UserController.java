@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +38,7 @@ dùng để thiết lập mặc định cho tất cả các field trong class.
         - level = AccessLevel.PRIVATE: tất cả các field trong class sẽ mặc định là private.
         - makeFinal = true: tất cả các field sẽ mặc định là final.
 */
+@Slf4j
 public class UserController {
     //    @Autowired
     UserService userService;
@@ -49,6 +52,13 @@ public class UserController {
 
     @GetMapping
     APIResponse<List<UserResponse>> getUsers() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        authentication
+                .getAuthorities()
+                .forEach(
+                        grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
         return APIResponse.<List<UserResponse>>builder()
                 .result(userService.getUsers())
                 .build();

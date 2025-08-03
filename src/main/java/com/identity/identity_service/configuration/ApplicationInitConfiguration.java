@@ -4,7 +4,6 @@ import com.identity.identity_service.entity.User;
 import com.identity.identity_service.enums.Role;
 import com.identity.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -33,7 +32,7 @@ public class ApplicationInitConfiguration {
     String SECRET_PASSWORD;
 
     @Bean
-    public ApplicationRunner passwordEncoder(UserRepository userRepository) {
+    public ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
             if (userRepository.findByUsername(SECRET_USERNAME).isEmpty()) {
                 var roles = new HashSet<String>();

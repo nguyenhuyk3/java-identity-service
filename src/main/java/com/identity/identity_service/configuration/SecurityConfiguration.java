@@ -44,8 +44,10 @@ import javax.crypto.spec.SecretKeySpec;
 */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfiguration {
-    String[] PUBLIC_ENDPOINTS = {"/users",
-            "/auth/token", "/auth/introspect"
+    String[] PUBLIC_ENDPOINTS = {
+            "/users",
+            "/auth/token",
+            "/auth/introspect"
     };
 
     @NonFinal
@@ -62,9 +64,7 @@ public class SecurityConfiguration {
         httpSecurity.authorizeHttpRequests(
                 req -> req
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
-                        .anyRequest()
-                        .authenticated());
+                        .anyRequest().authenticated());
         /*
             Kích hoạt OAuth2 Resource Server mode: tức là ứng dụng của bạn không phát hành token,
         mà chỉ nhận và xác minh token từ client.
@@ -75,10 +75,10 @@ public class SecurityConfiguration {
 //                        .jwt(
 //                                jwtConfigurer -> jwtConfigurer
 //                                        .decoder(jwtDecoder())));
-
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
-                        jwtConfigurer.decoder(jwtDecoder())
+                        jwtConfigurer
+                                .decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 

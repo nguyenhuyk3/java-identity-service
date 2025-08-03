@@ -12,7 +12,9 @@ import com.identity.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +69,22 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(newUser));
     }
 
+    public UserResponse getMyInfo() {
+        var context = SecurityContextHolder.getContext();
+        String userName = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        return userMapper.toUserResponse(user);
+    }
+
+    /*
+        returnObject: Đối tượng được trả về từ method.
+        authentication.name: Lấy username của người dùng hiện tại đang đăng nhập,
+                                tức SecurityContextHolder.getContext().getAuthentication().getName()
+    */
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id) {
         return userMapper
                 .toUserResponse(userRepository.findById(id)
@@ -86,7 +104,12 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
+        var context = SecurityContextHolder.getContext();
+
+        System.out.println(context.getAuthentication().getName());
+
         return userRepository
                 .findAll()
                 .stream()

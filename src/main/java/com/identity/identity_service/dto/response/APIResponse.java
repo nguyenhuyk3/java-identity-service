@@ -17,6 +17,7 @@ dễ đọc và không cần constructor dài dòng.
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class APIResponse<T> {
     private T result;
+
     @Builder.Default
     /*
         @Builder.Default là một annotation của thư viện Lombok trong Java.
@@ -24,5 +25,6 @@ public class APIResponse<T> {
     và muốn gán giá trị mặc định cho một field nếu nó không được set khi build object.
     */
     private int code = 1000;
+
     private String message;
 }

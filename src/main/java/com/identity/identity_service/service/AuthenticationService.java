@@ -105,6 +105,7 @@ public class AuthenticationService {
     private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                // Gán Username vào trường "sub" trong jwt token.
                 .subject(user.getUsername())
                 .issuer(ISSUER)
                 .issueTime(new Date())

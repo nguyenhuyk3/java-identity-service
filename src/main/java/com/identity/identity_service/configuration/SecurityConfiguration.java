@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -41,6 +42,20 @@ import javax.crypto.spec.SecretKeySpec;
     trừ khi bạn định nghĩa @Bean SecurityFilterChain của riêng bạn (custom).
         + Nếu không thêm @EnableWebSecurity, Spring Boot vẫn bật security mặc định,
     nhưng bạn không thể cấu hình chi tiết được.
+*/
+@EnableMethodSecurity
+/*
+        - @EnableMethodSecurity là annotation của Spring Security dùng để bật bảo mật ở cấp độ method
+    — tức là cho phép sử dụng các annotation như:
+            + @PreAuthorize
+            + @PostAuthorize
+            + @Secured
+            + @RolesAllowed
+        - Ý nghĩa:
+            + Annotation này bật AOP proxy để can thiệp vào các method (controller/service)
+        và kiểm tra quyền truy cập.
+            + Nếu bạn không thêm @EnableMethodSecurity, thì @PreAuthorize
+        và các annotation tương tự sẽ không hoạt động, dù bạn có cấu hình Security đúng.
 */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfiguration {

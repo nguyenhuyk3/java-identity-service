@@ -8,6 +8,7 @@ import com.identity.identity_service.enums.Role;
 import com.identity.identity_service.exception.AppException;
 import com.identity.identity_service.exception.ErrorCode;
 import com.identity.identity_service.mapper.UserMapper;
+import com.identity.identity_service.repository.RoleRepository;
 import com.identity.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class UserService {
     //    @Autowired // @Autowired dùng để tự động tiêm (inject) một bean vào class đang sử dụng.
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -95,6 +97,11 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         userMapper.updateUser(user, req);
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+
+        var roles = roleRepository.findAllById(req.getRoles());
+
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

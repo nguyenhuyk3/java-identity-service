@@ -91,9 +91,10 @@ public class SecurityConfiguration {
 //                                        .decoder(jwtDecoder())));
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
-                        jwtConfigurer
-                                .decoder(jwtDecoder())
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                                jwtConfigurer
+                                        .decoder(jwtDecoder())
+                                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -124,7 +125,7 @@ public class SecurityConfiguration {
                 - Nếu trong JWT có roles: ["ADMIN"], thì sau khi convert, bạn sẽ nhận được quyền: ROLE_ADMIN
                 - Điều này giúp bạn dùng hasRole("ADMIN") trong Spring Security
         */
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
         // Gán converter vào JwtAuthenticationConverter, để khi Spring phân tích JWT, nó biết phải lấy quyền từ đâu và thêm tiền tố thế nào.
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();

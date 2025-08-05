@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -25,10 +26,23 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 
+/*
+        - @Slf4j là một annotation của thư viện Lombok trong Java,
+    dùng để tự động tạo ra một logger cho class mà bạn gắn annotation này, giúp bạn không phải viết thủ công phần khai báo logger nữa.
+        - @SpringBootTest là một annotation trong Spring Boot dùng để chạy test với toàn bộ context của ứng dụng Spring Boot.
+        - @AutoConfigureMockMvc là annotation trong Spring Boot Test, dùng để tự động cấu hình MockMvc
+    để bạn có thể test controller mà không cần khởi động server thật.
+        - @Testcontainers là annotation của thư viện Testcontainers Java dùng để quản lý vòng đời container Docker khi chạy test trong Java.
+            1. Chức năng
+                + Cho phép khởi chạy container Docker (PostgreSQL, MySQL, Redis, Kafka, Elasticsearch…) ngay trong test.
+                + @Testcontainers báo cho JUnit biết rằng class này có sử dụng container và nó cần được khởi động & dừng đúng lúc.
+                + Giúp test integration trên môi trường giống production hơn, thay vì mock database hoặc service.
+*/
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
+@TestPropertySource("/test.properties")
 public class UserControllerTest {
     static final MySQLContainer MY_SQL_CONTAINER;
 
@@ -83,10 +97,13 @@ public class UserControllerTest {
     void createUser_validRequest_success() throws Exception {
         // GIVEN
         ObjectMapper objectMapper = new ObjectMapper();
+
         objectMapper.registerModule(new JavaTimeModule());
+
         String content = objectMapper.writeValueAsString(request);
 
-        Mockito.when(userService.createNewUser(ArgumentMatchers.any()))
+        Mockito
+                .when(userService.createNewUser(ArgumentMatchers.any()))
                 .thenReturn(userResponse);
 
         // WHEN, THEN
@@ -98,9 +115,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code")
                         .value(1000))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.id")
-                        .value("cf0600f538b3")
-
-                );
+                        .value("cf0600f538b3"));
     }
 
     @Test
@@ -108,8 +123,11 @@ public class UserControllerTest {
     void createUser_usernameInvalid_fail() throws Exception {
         // GIVEN
         request.setUsername("joh");
+
         ObjectMapper objectMapper = new ObjectMapper();
+
         objectMapper.registerModule(new JavaTimeModule());
+
         String content = objectMapper.writeValueAsString(request);
 
         // WHEN, THEN
@@ -121,7 +139,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code")
                         .value(1003))
                 .andExpect(MockMvcResultMatchers.jsonPath("message")
-                        .value("Username must be at least 4 characters")
-                );
+                        .value("Username must be at least 4 characters"));
     }
 }

@@ -1,10 +1,11 @@
 package com.identity.identity_service.services;
 
+import com.identity.identity_service.constants.PredefinedRole;
 import com.identity.identity_service.dto.requests.UserCreationRequest;
 import com.identity.identity_service.dto.requests.UserUpdateRequest;
 import com.identity.identity_service.dto.responses.UserResponse;
 import com.identity.identity_service.entities.User;
-import com.identity.identity_service.enums.Role;
+import com.identity.identity_service.entities.Role;
 import com.identity.identity_service.exceptions.AppException;
 import com.identity.identity_service.exceptions.ErrorCode;
 import com.identity.identity_service.mappers.UserMapper;
@@ -13,6 +14,7 @@ import com.identity.identity_service.repositories.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,21 +58,25 @@ public class UserService {
 //    }
 
     public UserResponse createNewUser(UserCreationRequest req) {
-        if (userRepository.existsByUsername(req.getUsername())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
-        }
-
         User newUser = userMapper.toUser(req);
 
         newUser.setPassword(passwordEncoder.encode(req.getPassword()));
 
-        HashSet<String> roles = new HashSet<>();
+        HashSet<Role> roles = new HashSet<>();
+        /*
+            Cú pháp roles::add là method reference tương đương với: r -> roles.add(r)
+        */
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
-        roles.add(Role.USER.name());
+        newUser.setRoles(roles);
 
-//        newUser.setRoles(roles);
+        try {
+            newUser = userRepository.save(newUser);
+        } catch (DataIntegrityViolationException exception) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
 
-        return userMapper.toUserResponse(userRepository.save(newUser));
+        return userMapper.toUserResponse(newUser);
     }
 
     public UserResponse getMyInfo() {
@@ -87,6 +93,7 @@ public class UserService {
         authentication.name: Lấy username của người dùng hiện tại đang đăng nhập,
                                 tức SecurityContextHolder.getContext().getAuthentication().getName()
     */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found")));
@@ -106,6 +113,7 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userId) {
         userRepository.deleteById(userId);
     }

@@ -33,6 +33,13 @@ public class ApplicationInitConfiguration {
     String SECRET_PASSWORD;
 
     @Bean
+    /*
+        Nó được dùng để chỉ tạo bean hoặc cấu hình nếu một property nào đó trong application.properties (hoặc application.yml) thỏa điều kiện.
+            + prefix = "spring" → phần đầu của key property.
+            + value = "datasource.driverClassName" → phần sau của key property.
+            + Ghép lại: spring.datasource.driverClassName
+            + havingValue = "com.mysql.cj.jdbc.Driver" → chỉ kích hoạt bean nếu giá trị của property bằng giá trị này.
+    */
     @ConditionalOnProperty(
             prefix = "spring",
             value = "datasource.driverClassName",

@@ -3,6 +3,7 @@ package com.identity.identity_service.services;
 import com.identity.identity_service.dto.requests.AuthenticationRequest;
 import com.identity.identity_service.dto.requests.IntrospectRequest;
 import com.identity.identity_service.dto.requests.LogoutRequest;
+import com.identity.identity_service.dto.requests.RefreshRequest;
 import com.identity.identity_service.dto.responses.AuthenticationResponse;
 import com.identity.identity_service.dto.responses.IntrospectResponse;
 import com.identity.identity_service.entities.InvalidatedToken;
@@ -52,7 +53,7 @@ public class AuthenticationService {
     protected String SIGNER_KEY;
 
     @NonFinal
-    @Value("{jwt.issuer}")
+    @Value("${jwt.issuer}")
     protected String ISSUER;
 
 //    public boolean authenticate(AuthenticationRequest req) {
@@ -175,5 +176,35 @@ public class AuthenticationService {
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);
+    }
+
+    public AuthenticationResponse refreshToken(RefreshRequest req)
+            throws ParseException, JOSEException {
+        var signedJWT = verifyToken(req.getToken());
+        /*
+            Phương thức getJWTClaimsSet() trong signedJWT.getJWTClaimsSet()
+        dùng để lấy toàn bộ phần payload (claims) của một JWT (JSON Web Token) đã được parse.
+        */
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        InvalidatedToken invalidatedToken = InvalidatedToken
+                .builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHENTICATED)
+        );
+        var token = generateToken(user);
+
+        return AuthenticationResponse
+                .builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 }

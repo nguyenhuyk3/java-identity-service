@@ -63,7 +63,8 @@ public class SecurityConfiguration {
             "/users",
             "/auth/token",
             "/auth/introspect",
-            "/auth/logout"
+            "/auth/logout",
+            "/auth/refresh"
     };
 
     @Autowired
@@ -96,6 +97,10 @@ public class SecurityConfiguration {
 //                        .jwt(
 //                                jwtConfigurer -> jwtConfigurer
 //                                        .decoder(jwtDecoder())));
+        /*
+            - httpSecurity.oauth2ResourceServer(...): Khai báo ứng dụng hoạt động như một OAuth2 Resource Server — nơi mà các request cần token hợp lệ để được chấp nhận.
+            - .authenticationEntryPoint(new JwtAuthenticationEntryPoint()): Tùy chỉnh cách xử lý khi xác thực thất bại (unauthenticated request).
+        */
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
                                 jwtConfigurer

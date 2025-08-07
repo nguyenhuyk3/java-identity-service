@@ -1,8 +1,9 @@
 package com.identity.identity_service.exceptions;
 
-import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+
+import lombok.*;
 
 @Getter
 @AllArgsConstructor

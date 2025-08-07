@@ -1,11 +1,13 @@
 package com.identity.identity_service.dto.requests;
 
-import com.identity.identity_service.validators.DOBConstraint;
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.Size;
+
+import com.identity.identity_service.validators.DOBConstraint;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor

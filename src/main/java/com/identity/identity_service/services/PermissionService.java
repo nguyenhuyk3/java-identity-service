@@ -1,17 +1,19 @@
 package com.identity.identity_service.services;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.identity.identity_service.dto.requests.PermissionRequest;
 import com.identity.identity_service.dto.responses.PermissionResponse;
 import com.identity.identity_service.entities.Permission;
 import com.identity.identity_service.mappers.PermissionMapper;
 import com.identity.identity_service.repositories.PermissionRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

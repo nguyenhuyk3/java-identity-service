@@ -1,11 +1,12 @@
 package com.identity.identity_service.dto.responses;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
@@ -20,5 +21,5 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate dateOfBirth;
-    Set<String> roles;
+    Set<RoleResponse> roles;
 }

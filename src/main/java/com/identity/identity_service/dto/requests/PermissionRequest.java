@@ -12,4 +12,3 @@ public class PermissionRequest {
     String name;
     String description;
 }
-

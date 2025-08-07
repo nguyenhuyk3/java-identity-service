@@ -1,10 +1,13 @@
 package com.identity.identity_service.services;
 
-import com.identity.identity_service.dto.requests.UserCreationRequest;
-import com.identity.identity_service.dto.responses.UserResponse;
-import com.identity.identity_service.entities.User;
-import com.identity.identity_service.exceptions.AppException;
-import com.identity.identity_service.repositories.UserRepository;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +17,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.identity.identity_service.dto.requests.UserCreationRequest;
+import com.identity.identity_service.dto.responses.UserResponse;
+import com.identity.identity_service.entities.User;
+import com.identity.identity_service.exceptions.AppException;
+import com.identity.identity_service.repositories.UserRepository;
 
 @SpringBootTest
 @TestPropertySource("/test.properties")
@@ -40,8 +41,7 @@ public class UserServiceTest {
     void initData() {
         dateOfBirth = LocalDate.of(1990, 1, 1);
 
-        request = UserCreationRequest
-                .builder()
+        request = UserCreationRequest.builder()
                 .username("john")
                 .firstName("John")
                 .lastName("Doe")
@@ -49,8 +49,7 @@ public class UserServiceTest {
                 .dateOfBirth(dateOfBirth)
                 .build();
 
-        userResponse = UserResponse
-                .builder()
+        userResponse = UserResponse.builder()
                 .id("cf0600f538b3")
                 .username("john")
                 .firstName("John")
@@ -87,12 +86,10 @@ public class UserServiceTest {
         when(userRepository.existsByUsername(anyString())).thenReturn(true);
 
         // WHEN
-        var exception = assertThrows(AppException.class,
-                () -> userService.createNewUser(request));
+        var exception = assertThrows(AppException.class, () -> userService.createNewUser(request));
 
         // THEN
-        Assertions.assertThat(exception.getErrorCode().getCode())
-                .isEqualTo(1002);
+        Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1002);
     }
 
     @Test
@@ -106,20 +103,17 @@ public class UserServiceTest {
         Assertions.assertThat(response.getId()).isEqualTo("cf0600f538b3");
     }
 
-
     @Test
     @WithMockUser(username = "john")
     /*
-        @WithMockUser(username = "john") → tạo một người dùng giả lập (Authentication) trong Spring Security context với username = "john".
-        -> Điều này giúp khi code gọi SecurityContextHolder.getContext().getAuthentication() sẽ nhận ra user hiện tại là "john".
+    	@WithMockUser(username = "john") → tạo một người dùng giả lập (Authentication) trong Spring Security context với username = "john".
+    	-> Điều này giúp khi code gọi SecurityContextHolder.getContext().getAuthentication() sẽ nhận ra user hiện tại là "john".
     */
     void getMyInfo_userNotFound_error() {
-        when(userRepository.findByUsername(anyString()))
-                .thenReturn(Optional.ofNullable(null));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(null));
 
         // WHEN
-        var exception = assertThrows(AppException.class,
-                () -> userService.getMyInfo());
+        var exception = assertThrows(AppException.class, () -> userService.getMyInfo());
 
         Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1005);
     }

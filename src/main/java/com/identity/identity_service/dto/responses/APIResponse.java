@@ -1,12 +1,13 @@
 package com.identity.identity_service.dto.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Builder
 /*
-    @Builder là một annotation của Lombok giúp bạn
+	@Builder là một annotation của Lombok giúp bạn
 tự động tạo "Builder pattern" cho class Java — cho phép bạn khởi tạo đối tượng một cách linh hoạt,
 dễ đọc và không cần constructor dài dòng.
 */
@@ -20,11 +21,11 @@ public class APIResponse<T> {
 
     @Builder.Default
     /*
-        @Builder.Default là một annotation của thư viện Lombok trong Java.
-            Nó được sử dụng khi bạn dùng @Builder để tạo pattern Builder cho class,
-        và muốn gán giá trị mặc định cho một field nếu nó không được set khi build object.
+    	@Builder.Default là một annotation của thư viện Lombok trong Java.
+    		Nó được sử dụng khi bạn dùng @Builder để tạo pattern Builder cho class,
+    	và muốn gán giá trị mặc định cho một field nếu nó không được set khi build object.
     */
-            int code = 1000;
+    int code = 1000;
 
     String message;
 }

@@ -1,6 +1,7 @@
 package com.identity.identity_service.mappers;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import com.identity.identity_service.dto.requests.UserCreationRequest;
@@ -23,5 +24,7 @@ public interface UserMapper {
     		- Khi bạn muốn MapStruct copy dữ liệu từ một object nguồn (source)
     	sang object đích (target) đã tồn tại, bạn dùng @MappingTarget để đánh dấu đối tượng đích.
     */
+
+    @Mapping(target = "roles", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest req);
 }

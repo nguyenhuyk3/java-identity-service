@@ -1,7 +1,6 @@
 package com.identity.identity_service.mappers;
 
 import org.mapstruct.Mapper;
-
 import com.identity.identity_service.dto.requests.PermissionRequest;
 import com.identity.identity_service.dto.responses.PermissionResponse;
 import com.identity.identity_service.entities.Permission;

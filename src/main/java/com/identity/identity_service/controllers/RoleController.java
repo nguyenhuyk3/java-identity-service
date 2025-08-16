@@ -2,6 +2,7 @@ package com.identity.identity_service.controllers;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.identity.identity_service.dto.requests.RoleRequest;
@@ -23,6 +24,7 @@ public class RoleController {
     RoleService roleService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     APIResponse<RoleResponse> createNewRole(@RequestBody RoleRequest req) {
         return APIResponse.<RoleResponse>builder()
                 .result(roleService.createNewRole(req))
@@ -30,6 +32,7 @@ public class RoleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     APIResponse<List<RoleResponse>> getAllRoles() {
         return APIResponse.<List<RoleResponse>>builder()
                 .result(roleService.getAllRoles())
@@ -37,6 +40,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{role}")
+    @PreAuthorize("hasRole('ADMIN')")
     APIResponse<Void> deleteRole(@PathVariable String role) {
         roleService.deleteRole(role);
 

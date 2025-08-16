@@ -2,6 +2,7 @@ package com.identity.identity_service.controllers;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.identity.identity_service.dto.requests.PermissionRequest;
@@ -23,6 +24,7 @@ public class PermissionController {
     PermissionService permissionService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     APIResponse<PermissionResponse> createNewPermission(@RequestBody PermissionRequest req) {
         return APIResponse.<PermissionResponse>builder()
                 .result(permissionService.createNewPermission(req))
@@ -30,6 +32,7 @@ public class PermissionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     APIResponse<List<PermissionResponse>> getAllPermissions() {
         return APIResponse.<List<PermissionResponse>>builder()
                 .result(permissionService.getAllPermissions())
@@ -37,6 +40,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/{permission}")
+    @PreAuthorize("hasRole('ADMIN')")
     APIResponse<Void> deletePermission(@PathVariable String permission) {
         permissionService.deletePermission(permission);
 

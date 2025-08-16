@@ -41,7 +41,7 @@ import lombok.experimental.NonFinal;
 		+ Nếu không thêm @EnableWebSecurity, Spring Boot vẫn bật security mặc định,
 	nhưng bạn không thể cấu hình chi tiết được.
 */
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 /*
 		- @EnableMethodSecurity là annotation của Spring Security dùng để bật bảo mật ở cấp độ method
 	— tức là cho phép sử dụng các annotation như:
@@ -74,10 +74,10 @@ public class SecurityConfiguration {
         	.anyRequest().authenticated(): tất cả các request khác đều yêu cầu
         xác thực (phải có JWT hợp lệ).
         */
-        httpSecurity.authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
-                .permitAll()
-                .anyRequest()
-                .authenticated());
+        httpSecurity.authorizeHttpRequests(
+                req -> req.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                        .permitAll()
+                        .anyRequest().authenticated());
         /*
         	Kích hoạt OAuth2 Resource Server mode: tức là ứng dụng của bạn không phát hành token,
         mà chỉ nhận và xác minh token từ client.
@@ -92,10 +92,11 @@ public class SecurityConfiguration {
         	- httpSecurity.oauth2ResourceServer(...): Khai báo ứng dụng hoạt động như một OAuth2 Resource Server — nơi mà các request cần token hợp lệ để được chấp nhận.
         	- .authenticationEntryPoint(new JwtAuthenticationEntryPoint()): Tùy chỉnh cách xử lý khi xác thực thất bại (unauthenticated request).
         */
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+        httpSecurity.oauth2ResourceServer(
+                oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                                .decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -126,8 +127,8 @@ public class SecurityConfiguration {
         		- Nếu trong JWT có roles: ["ADMIN"], thì sau khi convert, bạn sẽ nhận được quyền: ROLE_ADMIN
         		- Điều này giúp bạn dùng hasRole("ADMIN") trong Spring Security
         */
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("scope");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
         // Gán converter vào JwtAuthenticationConverter, để khi Spring phân tích JWT, nó biết phải lấy quyền từ đâu và
         // thêm tiền tố thế nào.
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
